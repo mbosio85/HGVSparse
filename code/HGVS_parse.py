@@ -7,7 +7,7 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description = 'Parse HGVS to VCF')
-parser.add_argument('--infile', type=str dest='infile', required=True, help='Input file [required]')
+parser.add_argument('--infile', type=str, dest='infile', required=True, help='Input file [required]')
 parser.add_argument('--outfile', type=str, dest='outfile', required=True, help='Output  [required]')
 parser.add_argument('--ref', type=str, dest='ref', required=True, help='FASTA file with reference [required]')
 parser.add_argument('--transcript',  type=str, dest='transcript', required=True, help='transcript file [required]')
