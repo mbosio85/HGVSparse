@@ -34,7 +34,11 @@ echo "############################################"
 echo "#Step 1 : parse the data from excel to HGVS like "
 echo "############################################"
 
-  python $CODE/parse_vars.py $INFILE > $OUTFOLDER/$PREFIX"_HGVS_parsed.txt"
+  python $CODE/parse_vars.py \
+	 --infile $INFILE \
+         --outfile $OUTFOLDER/$PREFIX"_HGVS_parsed.txt" \
+	 --region NC_000023.11:g.,NM_004992.3:c.
+
   echo "Done"
   echo " " 
 
@@ -52,16 +56,16 @@ echo "############################################"
 echo "#Step3  : parse to VCF"
 echo "############################################"
 
+
  python $CODE/HGVS_parse.py \
 	--infile $OUTFOLDER/$PREFIX"_HGVS_input.txt" \
 	--outfile $OUTFOLDER/$PREFIX".vcf" \
         --ref $REF \
         --transcript $TRANSCRIPT  &> $OUTFOLDER/$PREFIX"_step3.log"
 
-
- grep    Error $OUTFOLDER/$PREFIX".vcf"    > $OUTFOLDER/$PREFIX".error.vcf" 
- grep -v Error $OUTFOLDER/$PREFIX".vcf"    > $OUTFOLDER/$PREFIX".ok.vcf"
-
+  { grep  -P 'Error' $OUTFOLDER/$PREFIX".vcf" > $OUTFOLDER/$PREFIX".error.vcf"  || test $? = 1; } 
+  grep -v 'Error' $OUTFOLDER/$PREFIX".vcf"    > $OUTFOLDER/$PREFIX".ok.vcf"
+ 
 
 echo "Done"
 echo " "

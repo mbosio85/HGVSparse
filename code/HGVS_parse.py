@@ -27,7 +27,7 @@ with open(args.transcript) as infile:
 def get_transcript(name):
     return transcripts.get(name)
 
-with open(sys.argv[1]) as rd,open(sys.argv[2],'w') as wr:
+with open(args.infile) as rd,open(args.outfile,'w') as wr:
     wr.write('\t'.join(['#Chr','Start','End','Ref','Alt','Group']) + '\n')
     for line in rd:
         #print line.strip()

@@ -1,5 +1,6 @@
 import sys
 import re
+import argparse
 ID = 0
 
 def RepresentsInt(s):
@@ -87,27 +88,50 @@ def one_to_parse(variant,offset=10):
 
 print "This tool is required to put variants directly in format HGVS without uncertainty to be used later with hgvs parser.py and produce a VCF"
 print "Status\tID\toriginal variant\tParsed variant\tVCF variant"
-with open(sys.argv[1]) as rd:
+
+parser = argparse.ArgumentParser(description = 'Parse HGVS to VCF')
+parser.add_argument('--infile', type=str, dest='infile', required=True, help='Input file [required]')
+parser.add_argument('--outfile', type=str, dest='outfile', required=True, help='Output  [required]')
+parser.add_argument('--region', type=str, dest='reg', required=True, help='comma separated list of transcript IDs or Gene IDs to keep [required]')
+args = parser.parse_args()
+
+myregion = args.reg.split(',')
+#defregion = "NC_000023.11:g.,NM_004992.3:c."
+with open(args.infile) as rd,open(args.outfile,'w') as wr:
     for line in rd:
         ID +=1 
         # For us it's not interesting at the moment the allel specific annotation
         # So we will remove the '[]'
         # and also substitute (;) with ;
         #print ID
-        #Step 1 Isolate the genomic region 
-        region='NC_000023.11:g.'
-        if region in line:
-            pass
-        elif 'NM_004992.3:c.' in line:
-            region ='NM_004992.3:c.'
-        else:
-            print 'adjust the script because only supports %s and %s as regions '%(region, 'NM_004992.3:c.')
-            print 'exiting'
-            print line
-            raise
+        #Step 1 Isolate the genomic regio 
+        region = [x for x in myregion if x in line]
+        if len(region) ==1:
+            region = region[0]
+        else: 
+            print 'Error'
+            if len(region) > 1:
+                print 'Multiple regions from %s appear '%(args.reg)
+                print line
+                raise
+            else:
+                print 'No regions from %s appear '%(args.reg)
+                print line 
+                raise
+
+#        region='NC_000023.11:g.'
+#        if region in line:
+#            pass
+#        elif 'NM_004992.3:c.' in line:
+#            region ='NM_004992.3:c.'
+#        else:
+#            print 'adjust the script because only supports %s and %s as regions '%(region, 'NM_004992.3:c.')
+#            print 'exiting'
+#            print line
+#            raise
 
         variants   = line.strip().split(region)[1].replace('[','').replace(']','').replace('(;)',';').split(';')
-        #print variants
+
         
         #Now _ variant by variant
         # Variant is composed of   Part1, Part2 and Type (e.g. delinsXXX)
@@ -132,7 +156,7 @@ with open(sys.argv[1]) as rd:
                 elif len(Parts) == 1 and '(' in Parts[0] and ')' in Parts[0]:
                   tmp = one_to_parse(Parts[0])
                 else:                
-                  print "KK\t%s\t%s\t%s"%(FinalID,variants[i],''.join([region,variants[i]])) # nothing I can do here
+                  wr.write("KK\t%s\t%s\t%s\n"%(FinalID,variants[i],''.join([region,variants[i]]))) # nothing I can do here
                   continue
                    
                 #now we have the tmp string which is START_END
@@ -150,13 +174,10 @@ with open(sys.argv[1]) as rd:
 #                    raise
                 
                 
-                print "OK\t%s\t%s\t%s"%(FinalID,''.join([region,variants[i]]),''.join([region,tmp,type_var] ))
+                wr.write("OK\t%s\t%s\t%s\n"%(FinalID,''.join([region,variants[i]]),''.join([region,tmp,type_var] )))
                
                
             except:
-                print "KO\t%s\t%s\t%s"%(FinalID,''.join([region,variants[i]]),variants[i])
-                #print 'error'
-                #raise
-
-        
+                wr.write("KO\t%s\t%s\t%s\n"%(FinalID,''.join([region,variants[i]]),variants[i]))
+       
         
