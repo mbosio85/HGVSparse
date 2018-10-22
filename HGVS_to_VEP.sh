@@ -17,7 +17,7 @@ VEP='FALSE'
 dbNSFP='/data/resources/vep/dbNSFP.gz'
 dbscSNV='/data/resources/vep/dbscSNV1.1_GRCh38.txt.gz'
 
-  while getopts 'i:o:p:c:g:t:v' flag; do
+  while getopts 'i:o:p:c:g:t:r:v' flag; do
     case "${flag}" in
       i) INFILE="${OPTARG}" ;;
       o) OUTFOLDER="${OPTARG}" ;;
@@ -25,7 +25,8 @@ dbscSNV='/data/resources/vep/dbscSNV1.1_GRCh38.txt.gz'
       c) CODE="${OPTARG}" ;;
       g) REF="${OPTARG}" ;;
       t) TRANSCRIPT="${OPTARG}" ;;
-      v) VEP="TRUE" ;; 
+      v) VEP="TRUE" ;;
+      r) REGION="${OPTARG}" ;; 
       *) "Unexpected option ${flag}" ;;
     esac
   done
@@ -37,8 +38,8 @@ echo "############################################"
   python $CODE/parse_vars.py \
 	 --infile $INFILE \
          --outfile $OUTFOLDER/$PREFIX"_HGVS_parsed.txt" \
-	 --region NC_000023.11:g.,NM_004992.3:c.
-
+	 --region  $REGION 
+  #MECP2: NC_000023.11:g.,NM_004992.3:c.
   echo "Done"
   echo " " 
 
