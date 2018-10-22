@@ -72,8 +72,9 @@ echo " "
 echo ">>>>>>>>>  VCF to annotate :  $OUTFOLDER/$PREFIX".ok.vcf" <<<<<<<<"
 echo " "
 
+echo $VEP
 
-if (( $VEP = 'TRUE' )) ; then
+if [ "$VEP" = 'TRUE' ]; then
 
 	echo "############################################"
         echo "#Step 4 : Annotate with VEP" 
@@ -85,7 +86,7 @@ if (( $VEP = 'TRUE' )) ; then
          --format vcf \
          --flag_pick \
          --force_overwrite \
-         --plugin dbNSFP,$dbNSFP \
+         --plugin dbNSFP,$dbNSFP,MetaLR_score,CADD_phred,fathmm-MKL_coding_score \
          --plugin dbscSNV,$dbscSNV
        
        echo "############################################"
